@@ -14,24 +14,24 @@ You are given a JSON log file that contains data associated with web traffic and
 
 **Statistical Analysis**
 
-  What is the total number of entries in the log file?
+ - What is the total number of entries in the log file?
   
-  How Many Unique Client IP addresses made requests
+ - How Many Unique Client IP addresses made requests
   
-  What are the top countries?
+ - What are the top countries?
   
-  How Many Unique User Agents?
+ - How Many Unique User Agents?
   
-  What is the Top User Agent?
+ - What is the Top User Agent?
   
-  What are the HTTP methods in the log file?
+ - What are the HTTP methods in the log file?
   
-  How Many Unique Response Codes? What are they?
+ - How Many Unique Response Codes? What are they?
   
-  How many security levels are recorded? What are they?
+ - How many security levels are recorded? What are they?
 
 **Anomaly Analysis**
 
-  What are anomalous activities in the dataset? 
+ - What are anomalous activities in the dataset? 
 
-  Why is it anomalous and what can this indicate?
+ - Why is it anomalous and what can this indicate?
