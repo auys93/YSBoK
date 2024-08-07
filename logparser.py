@@ -17,12 +17,16 @@ log_folder = "/workspaces/YSBoK/Logs"
 #     except json.JSONDecodeError:
 #         print("Error: Invalid log entry format")
 
-def process_log_entry(log_entry):
+def process_log_entry(log_entry, unique_ips):
     try:
         log_data = json.loads(log_entry)
         print(json.dumps(log_data, indent=4))
         with open("/workspaces/YSBoK/Output/output.txt", "a") as f:
             f.write(json.dumps(log_data, indent=4) + "\n")
+        client_ip = log_data.get("ClientIP")
+        if client_ip:
+            unique_ips.add(client_ip)
+
     except json.JSONDecodeError:
         print("Error: Invalid log entry format")
         print(f"Raw Log Entry: {log_entry}")
@@ -38,14 +42,19 @@ def process_log_entry(log_entry):
 #                     print("-" * 40)
 
 def process_log_files(folder_path):
+    total_entries = 0 #intialize count
+    unique_ips = set()  # Initialize a set for unique IPs
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):
             with open(file_path, "r") as log_file:
                 log_entries = [line.strip() for line in log_file.readlines() if line.strip() and not line.strip().startswith("#")]
                 for entry in log_entries:
-                    process_log_entry(entry)
+                    process_log_entry(entry, unique_ips)
+                    total_entries += 1  # Increment the count
                     print("-" * 40)
+    print(f"Total log entries: {total_entries}")
+    print(f"Total unique client IP addresses: {len(unique_ips)}")
 
 if __name__ == "__main__":
     process_log_files(log_folder)
