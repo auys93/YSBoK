@@ -9,13 +9,14 @@ log_folder = "/workspaces/YSBoK/Logs"
 # Standard HTTP request methods
 standard_methods = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"}
 
-def process_log_entry(log_entry, unique_ips, country_counts):
+def process_log_entry(log_entry, unique_ips, country_counts, unique_user_agents):
     try:
         log_data = json.loads(log_entry)
         client_ip = log_data.get("ClientIP")
         country_code = log_data.get("ClientCountry", "").upper()
         request_bytes = log_data.get("ClientRequestBytes", 0)
         request_method = log_data.get("ClientRequestMethod", "").upper()
+        user_agent = log_data.get("ClientRequestUserAgent", "")
 
         if client_ip and request_bytes != 0 and request_method in standard_methods:
             unique_ips.add(client_ip)
@@ -25,6 +26,8 @@ def process_log_entry(log_entry, unique_ips, country_counts):
                 country_counts[country_name] += 1
             except AttributeError:
                 print(f"Unknown country code: {country_code}")
+        if user_agent:
+            unique_user_agents.add(user_agent)
         
     except json.JSONDecodeError:
         print("Error: Invalid log entry format")
