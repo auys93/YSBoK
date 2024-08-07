@@ -21,6 +21,8 @@ def process_log_entry(log_entry):
     try:
         log_data = json.loads(log_entry)
         print(json.dumps(log_data, indent=4))
+        with open("/workspaces/YSBoK/Output/output.txt", "a") as f:
+            f.write(json.dumps(log_data, indent=4) + "\n")
     except json.JSONDecodeError:
         print("Error: Invalid log entry format")
         print(f"Raw Log Entry: {log_entry}")
