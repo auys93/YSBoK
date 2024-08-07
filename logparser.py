@@ -2,7 +2,7 @@ import os
 import json
 
 # Folder containing log files (replace with your folder path)
-log_folder = "D:\Codes\Raw"
+log_folder = "/workspaces/YSBoK/Logs"
 
 # def process_log_entry(log_entry):
 #     try:
