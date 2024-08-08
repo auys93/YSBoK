@@ -3,6 +3,7 @@ import json
 from collections import Counter
 import pycountry
 import pandas as pd
+from datetime import datetime, timedelta
 
 # Folder containing log files (replace with your folder path)
 log_folder = "/workspaces/YSBoK/Logs"
@@ -21,9 +22,14 @@ def process_log_entry(log_entry, unique_ips, country_counts, unique_user_agents,
         http_response_code = log_data.get("ClientRequestMethod", "")
         edge_response_status = log_data.get("EdgeResponseStatus", "")
         security_level = log_data.get("SecurityLevel", "")
-
-        # Collect log data for anomaly detection
-        log_entries_list.append(log_data)
+        
+        # Store timestamp and country in log_entries_list
+        log_entries_list.append({
+            'timestamp': log_data.get("EdgeStartTimestamp", ""),
+            'country': log_data.get("ClientCountry", ""),
+            'client_ip': log_data.get("ClientIP", ""),
+            # ...
+        })
 
         if client_ip and request_bytes != 0 and request_method in standard_methods:
             unique_ips[client_ip] += 1
@@ -123,46 +129,45 @@ def process_log_files(folder_path):
     # Convert log entries list to DataFrame for anomaly detection
     log_df = pd.DataFrame(log_entries_list)
     anomalies = identify_anomalies(log_df)
-    print('\nAnomalies detected:', anomalies)
+    print('\nAnomalies detected:')
+    # Assuming anomalies is a list of dictionaries
+    for anomaly in anomalies:
+        for key, value in anomaly.items():
+            print(f"{key}: {value}")
+        print()  # Adds a newline after each dictionary
+
 
 def identify_anomalies(df):
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+    # Sort by timestamp
+    df = df.sort_values(by='timestamp')
+
+    # Initialize variables to track anomalies
     anomalies = []
+    country_ip_map = {}
 
-    if df['CacheResponseStatus'].value_counts().idxmax() != 200:
-        anomalies.append('Unexpected CacheResponseStatus')
+    # Iterate over log entries
+    for index, row in df.iterrows():
+        country = row['country']
+        client_ip = row['client_ip']
+        timestamp = row['timestamp']
 
-    if df['ClientCountry'].nunique() > 10:
-        anomalies.append('High number of unique ClientCountry')
+        # Check if client IP has made requests from multiple countries within a short timeframe (e.g., 1 hour)
+        if client_ip in country_ip_map:
+            previous_country, previous_timestamp = country_ip_map[client_ip]
+            if country != previous_country and timestamp - previous_timestamp < timedelta(minutes=15):
+                anomalies.append({
+                    'client_ip': client_ip,
+                    'country': country,
+                    'previous_country': previous_country,
+                    'timestamp': timestamp,
+                    'anomaly': 'Multiple countries within 15 minutes'
+                })
 
-    if df['EdgeResponseStatus'].value_counts().idxmax() != 200:
-        anomalies.append('Unexpected EdgeResponseStatus')
+        # Update country IP map
+        country_ip_map[client_ip] = (country, timestamp)
 
-    if df['OriginResponseTime'].mean() > 1000000:
-        anomalies.append('High average OriginResponseTime')
-
-    if df['ClientIP'].value_counts().max() > 1000:
-        anomalies.append('High request rate from a single IP')
-
-    if df['ClientRequestUserAgent'].str.contains('bot|crawler|spider', case=False).any():
-        anomalies.append('Suspicious User-Agent detected')
-
-    if df['ClientRequestMethod'].value_counts().idxmax() not in ['GET', 'POST']:
-        anomalies.append('Unexpected HTTP method used')
-
-    if df['EdgeResponseStatus'].isin([400, 404, 500, 503]).sum() > 100:
-        anomalies.append('Frequent 4xx/5xx status codes')
-
-    if df['ClientSSLProtocol'].isin(['SSLv3', 'TLSv1.0']).any():
-        anomalies.append('Outdated SSL/TLS protocol used')
-
-    if df['EdgeRateLimitAction'].notna().sum() > 50:
-        anomalies.append('Frequent rate limiting actions')
-
-    if df['FirewallMatchesActions'].apply(len).sum() > 50:
-        anomalies.append('Frequent firewall matches')
-
-    if df['ClientRequestBytes'].max() > 1000000 or df['EdgeResponseBytes'].max() > 1000000:
-        anomalies.append('Unusually large request/response sizes')
 
     return anomalies
 
