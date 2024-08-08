@@ -5,15 +5,17 @@ import pycountry
 import pandas as pd
 from datetime import datetime, timedelta
 
-# Folder containing log files (replace with your folder path)
+# Declare folders where raw logs are and output of the report
 log_folder = "/workspaces/YSBoK/Logs"
 output_file = "/workspaces/YSBoK/Output/AnalystReport"
 
-# Standard HTTP request methods
+# Standard HTTP request methods for comparison
 standard_methods = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"}
 
+# Funtion to process the raw logs 
 def process_log_entry(log_entry, counters):
     try:
+        # declaration of all necessary variables for log processing
         log_data = json.loads(log_entry)
         client_ip = log_data.get("ClientIP")
         country_code = log_data.get("ClientCountry", "")
@@ -33,9 +35,12 @@ def process_log_entry(log_entry, counters):
             'user-agent': log_data.get("ClientRequestUserAgent", ""),
         })
 
+        # Process Unique Client IP addresses that made requests where the request bytes
+        # must be more than 0 and is a standard request method 
         if client_ip and request_bytes != 0 and request_method in standard_methods:
             counters['unique_ips'][client_ip] += 1
 
+        # Get the count of the country codes but also get the full name of the country through pycountry library
         if country_code:
             try:
                 country_name = pycountry.countries.get(alpha_2=country_code).name
@@ -43,6 +48,7 @@ def process_log_entry(log_entry, counters):
             except AttributeError:
                 print(f"Unknown country code: {country_code}")
 
+        # Process unique user agent and count for each user agent type plus exception if is empty
         if user_agent:
             counters['unique_user_agents'].add(user_agent)
             counters['user_agent_counts'][user_agent] += 1
@@ -50,27 +56,30 @@ def process_log_entry(log_entry, counters):
             counters['unique_user_agents'].add("EMPTY_USER_AGENT")
             counters['user_agent_counts']["EMPTY_USER_AGENT"] += 1
 
-        # Count HTTP response codes
+        # Process HTTP response codes and process also if empty
         if http_response_code:
             counters['http_response_counts'][http_response_code] += 1
         else:
             counters['http_response_counts']["EMPTY_RESPONSE_CODE"] += 1
 
-        # Count EdgeResponseStatus codes
+        # Process EdgeResponseStatus codes and process also if empty
         if edge_response_status:
             counters['edge_response_counts'][edge_response_status] += 1
         else:
             counters['edge_response_counts']["EMPTY_RESPONSE"] += 1
 
+        # process security levels and process also if empty
         if security_level:
             counters['security_level_counts'][security_level] += 1
         else:
             counters['security_level_counts']["EMPTY_SECURITY_LEVEL"] += 1
-
+            
+    # Exception for log file if is not in correct format
     except json.JSONDecodeError:
         print("Error: Invalid log entry format")
         print(f"Raw Log Entry: {log_entry}")
 
+# process log file and declare the counter collections module to do counting/storing with dictionary keys
 def process_log_files(folder_path, output_file):
     counters = {
         'log_entries': [],
@@ -83,6 +92,7 @@ def process_log_files(folder_path, output_file):
         'security_level_counts': Counter()
     }
 
+    # Process any log files in the folder path
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):
@@ -93,38 +103,42 @@ def process_log_files(folder_path, output_file):
 
     generate_report(counters, output_file)
 
+# Report Generation for all queries
 def generate_report(counters, output_file):
     with open(output_file, "w") as report_file:
         report_file.write("----Log Analyst Report----\n")
+        # Calculate total number of log lines
         report_file.write(f"\nTotal log entries: {len(counters['log_entries'])}\n")
+        # Calculate Unique IP address making requests and printing the unique ip addresses and count
         report_file.write(f"\nTotal unique client IP addresses making requests: {len(counters['unique_ips'])}\n")
         report_file.write("\nUnique IP addresses:\n")
         for ip, count in counters['unique_ips'].items():
             report_file.write(f"{ip}: {count}\n")
-
+        # Evaluate the most common client country and the count
         report_file.write("\nMost common country names:\n")
         for name, count in counters['country_counts'].most_common():
             report_file.write(f"{name}: {count}\n")
-
+        #. Evaluate the unqiue user agents including blank ones and which is the most common,
         report_file.write(f"\nTotal unique user agents: {len(counters['unique_user_agents'])}\n")
         report_file.write("\nTop User Agents:\n")
         for ua, count in counters['user_agent_counts'].most_common():
             report_file.write(f"{ua}: {count}\n")
-
+        #. Evaluate the HTTP Response Codes including blank ones and which is the most common,
         report_file.write("\nHTTP Response Code Counts:\n")
         for code, count in counters['http_response_counts'].items():
             report_file.write(f"{code}: {count}\n")
-
+        #. Evaluate the Edge Response including blank ones and which is the most common,
         report_file.write("\nEdgeResponseStatus Code Counts:\n")
         for response, count in counters['edge_response_counts'].items():
             report_file.write(f"{response}: {count}\n")
         report_file.write(f"Total number of unique response codes: {len(counters['edge_response_counts'])}\n")
-
+        #Evaluate the security level and its count
         report_file.write("\nSecurity Level Counts:\n")
         for seclvl, count in counters['security_level_counts'].items():
             report_file.write(f"{seclvl}: {count}\n")
         report_file.write(f"Total number of unique security level values: {len(counters['security_level_counts'])}\n")
-
+        
+        # Create a dataframe to manage the anomaly detection 
         log_df = pd.DataFrame(counters['log_entries'])
         anomalies = identify_anomalies(log_df)
         report_file.write('\nAnomalies detected:\n')
