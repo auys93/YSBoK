@@ -23,12 +23,13 @@ def process_log_entry(log_entry, unique_ips, country_counts, unique_user_agents,
         edge_response_status = log_data.get("EdgeResponseStatus", "")
         security_level = log_data.get("SecurityLevel", "")
         
-        # Store timestamp and country in log_entries_list
+        # Store data for anomaly analysis
         log_entries_list.append({
             'timestamp': log_data.get("EdgeStartTimestamp", ""),
             'country': log_data.get("ClientCountry", ""),
             'client_ip': log_data.get("ClientIP", ""),
-            # ...
+            'client_request_uri': log_data.get("ClientRequestURI", ""),
+            'user-agent': log_data.get("ClientRequestUserAgent", ""),
         })
 
         if client_ip and request_bytes != 0 and request_method in standard_methods:
@@ -146,6 +147,7 @@ def identify_anomalies(df):
     # Initialize variables to track anomalies
     anomalies = []
     country_ip_map = {}
+    ip_uri_map = {}
 
     # Iterate over log entries
     for index, row in df.iterrows():
@@ -153,7 +155,7 @@ def identify_anomalies(df):
         client_ip = row['client_ip']
         timestamp = row['timestamp']
 
-        # Check if client IP has made requests from multiple countries within a short timeframe (e.g., 1 hour)
+        # Check if client IP has made requests from multiple countries within a short timeframe
         if client_ip in country_ip_map:
             previous_country, previous_timestamp = country_ip_map[client_ip]
             if country != previous_country and timestamp - previous_timestamp < timedelta(minutes=15):
@@ -164,9 +166,28 @@ def identify_anomalies(df):
                     'timestamp': timestamp,
                     'anomaly': 'Multiple countries within 15 minutes'
                 })
-
         # Update country IP map
         country_ip_map[client_ip] = (country, timestamp)
+
+
+    # Iterate over log entries
+    for index, row in df.iterrows():
+        client_ip = row['client_ip']
+        timestamp = row['timestamp']
+        client_request_uri = row['client_request_uri']
+
+        # Check if IP has made a request with a different URI within a short timeframe (e.g., 5 seconds)
+        if client_ip in ip_uri_map:
+            previous_uri, previous_timestamp = ip_uri_map[client_ip]
+            if client_request_uri != previous_uri and timestamp - previous_timestamp < timedelta(seconds=30):
+                anomalies.append({
+                    'client_ip': client_ip,
+                    'timestamp': timestamp,
+                    'client_request_uri': client_request_uri,
+                    'anomaly': 'Change in URI within 5 seconds'
+                })
+        # Update IP URI map
+        ip_uri_map[client_ip] = (client_request_uri, timestamp)
 
 
     return anomalies

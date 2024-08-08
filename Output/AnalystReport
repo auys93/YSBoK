@@ -1,0 +1,57 @@
+----Log Analyst Report----
+
+Total log entries: 51
+
+Total unique client IP addresses making requests: 4
+
+Unique IP addresses:
+123.123.123.213: 13
+123.123.123.13: 10
+123.123.123.123: 15
+123.123.123.231: 13
+
+Most common country names:
+Portugal: 48
+United States: 3
+
+Total unique user agents: 2
+
+Top User Agents:
+Mozilla/5.0 (X11; CrOS x86_64 12871.17.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.25 Safari/537.36: 48
+EMPTY_USER_AGENT: 3
+
+HTTP Response Code Counts:
+GET: 51
+
+EdgeResponseStatus Code Counts:
+200: 48
+302: 3
+Total number of unique response codes: 2
+
+Security Level Counts:
+med: 51
+Total number of unique security level values: 1
+
+Anomalies detected:
+client_ip: 123.123.123.213
+country: pt
+previous_country: us
+timestamp: 2020-04-20 22:59:15+00:00
+anomaly: Multiple countries within 15 minutes
+
+client_ip: 123.123.123.231
+country: pt
+previous_country: us
+timestamp: 2020-04-20 22:59:30+00:00
+anomaly: Multiple countries within 15 minutes
+
+client_ip: 123.123.123.231
+timestamp: 2020-04-20 22:59:30+00:00
+client_request_uri: /api/v1/alerts/counter
+anomaly: Change in URI within 30 seconds
+
+client_ip: 123.123.123.231
+timestamp: 2020-04-20 23:02:29+00:00
+client_request_uri: /api/v1/alerts/sk_test_4eC39HqLyjWDarjtT1zdp7dc
+anomaly: Change in URI within 30 seconds
+
