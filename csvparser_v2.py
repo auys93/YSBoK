@@ -1,41 +1,54 @@
-import re
 import os
+import re
 
-# Specify the folder path that contains the log files
-log_folder = '/workspaces/YSBoK/CSVLogs'
+# Set the folder path and the output file path
+folder_path = '/workspaces/YSBoK/CSVLogs'
+output_file_path = '/workspaces/YSBoK/Output/normalized_logs'
 
-# Initialize an empty list to store the normalized log entries
-normalized_log = []
-
-# Iterate over the files in the log folder
-for filename in os.listdir(log_folder):
-    # Check if the file is a log file (e.g. has a .log extension)
-    if filename.endswith('.log'):
-        # Open the log file and read its contents
-        with open(os.path.join(log_folder, filename), 'r') as file:
-            # Split the log into lines
-            lines = file.readlines()
-
-            # Initialize an empty string to store the current log entry
-            current_entry = ''
-
-            # Iterate over the lines
-            for line in lines:
-                # Check if the line starts with a timestamp
-                if re.match(r'timestamp=', line):
-                    # If the current entry is not empty, add it to the normalized log
-                    if current_entry:
-                        normalized_log.append(current_entry.strip())
-                    # Reset the current entry with the new timestamp line
-                    current_entry = line
+# Open the output file in write mode
+with open(output_file_path, 'w') as output_file:
+    # Iterate over all files in the folder
+    for filename in os.listdir(folder_path):
+        # Open the file in read mode
+        with open(os.path.join(folder_path, filename), 'r') as file:
+            # Initialize an empty string to build the current log entry
+            current_log_entry = ''
+            # Iterate over all lines in the file
+            for line in file:
+                # Strip the line of leading and trailing whitespace
+                line = line.strip()
+                # If the line starts with a timestamp, it's a new log entry
+                if re.match(r'timestamp="[^"]+"', line):
+                    # If we're not at the start of the file, write the previous log entry
+                    if current_log_entry:
+                        output_file.write(current_log_entry + '\n')
+                    # Start a new log entry
+                    current_log_entry = line
                 else:
-                    # If the line does not start with a timestamp, append it to the current entry
-                    current_entry += ' ' + line
+                    # If the line does not start with a timestamp, append it to the current log entry
+                    current_log_entry += ' ' + line
+            # Write the last log entry to the output file
+            if current_log_entry:
+                output_file.write(current_log_entry + '\n')
 
-            # Add the last entry to the normalized log
-            if current_entry:
-                normalized_log.append(current_entry.strip())
+# Normalize the log entries
+with open(output_file_path, 'r') as file:
+    log_entries = file.read().split('\n')
 
-# Print the normalized log
-for entry in normalized_log:
-    print(entry)
+normalized_log_entries = []
+for log_entry in log_entries:
+    if log_entry:
+        fields = log_entry.split()
+        timestamp = fields[0].replace('timestamp="', '').replace('"', '')
+        message = fields[1].replace('message="', '').replace('"', '')
+        id = fields[2].replace('id=', '')
+        fields_dict = {}
+        for field in fields[3:]:
+            key, value = field.replace('"', '').split('=')
+            fields_dict[key] = value
+        normalized_log_entry = f'{timestamp} {message} id={id} {", ".join(f"{k}={v}" for k, v in fields_dict.items())}\n'
+        normalized_log_entries.append(normalized_log_entry)
+
+# Write the normalized log entries to the output file
+with open(output_file_path, 'w') as file:
+    file.write(''.join(normalized_log_entries))

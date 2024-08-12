@@ -21,13 +21,12 @@ with open(output_file_path, 'w') as output_file:
                 if re.match(r'\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \w{3} \d{4}', line):
                     # If we're not at the start of the file, write the previous log entry
                     if current_log_entry:
-                        output_file.write(current_log_entry + '\n')
-                        output_file.write('\n')
+                        output_file.write(current_log_entry)
                     # Start a new log entry
-                    current_log_entry = line
+                    current_log_entry = line + '\n'
                 else:
                     # If the line does not start with a timestamp, append it to the current log entry
                     current_log_entry += ' ' + line
             # Write the last log entry to the output file
             if current_log_entry:
-                output_file.write(current_log_entry + '\n\n')
+                output_file.write(current_log_entry)
