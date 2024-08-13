@@ -41,7 +41,7 @@ with open('/workspaces/YSBoK/Output/output.csv', 'w', newline='') as csvfile:
             dt = parser.parse(timestamp_original, fuzzy=True)
         # process rimezone in YYY-MM-DD format
         timestamp_formatted = dt.strftime('%Y-%m-%d')
-        row = [entry['id'], timestamp_formatted, timestamp_original, timezone_abbreviation, entry['message']]
+        row = [entry['id'], timestamp_formatted, timezone_abbreviation, entry['message']]
         for key in sorted(list(keys - {'id', 'timestamp', 'message'})):
             row.append(entry.get(key, ''))
         writer.writerow(row)
