@@ -35,9 +35,12 @@ with open(output_file_path, 'w') as output_file:
 with open(output_file_path, 'r') as file:
     log_entries = file.read().split('\n')
 
+#Initialize an empty list to store the normalized log entries.
 normalized_log_entries = []
+
 for log_entry in log_entries:
     if log_entry:
+        #Split the log entry into individual fields using whitespace as the separator.
         fields = log_entry.split()
         timestamp = fields[0].replace('timestamp="', '').replace('"', '')
         message = fields[1].replace('message="', '').replace('"', '')
@@ -46,6 +49,7 @@ for log_entry in log_entries:
         for field in fields[3:]:
             key, value = field.replace('"', '').split('=')
             fields_dict[key] = value
+        #Construct the normalized log entry by concatenating the timestamp, message, id, and the remaining fields (in the format key=value) separated by commas
         normalized_log_entry = f'{timestamp} {message} id={id} {", ".join(f"{k}={v}" for k, v in fields_dict.items())}\n'
         normalized_log_entries.append(normalized_log_entry)
 

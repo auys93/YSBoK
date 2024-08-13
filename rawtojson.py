@@ -9,6 +9,7 @@ with open('/workspaces/YSBoK/Output/normalized_logs', 'r') as f:
 log_data = []
 for line in log_lines:
     log_dict = {}
+    # Use regex to parse the key and values
     pairs = re.findall(r'(\w+)=(?:"([^"]*)"|(\S+))', line)
     for key, value1, value2 in pairs:
         log_dict[key] = value1 or value2

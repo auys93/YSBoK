@@ -22,22 +22,24 @@ with open('/workspaces/YSBoK/Output/output.csv', 'w', newline='') as csvfile:
         header.append(key.replace('field_', 'Field_').title())
     writer.writerow(header)
 
+    #Create a timezone mapping to align timezones
     timezone_map = {
         'PDT': pytz.timezone('US/Pacific'),
         'EST': pytz.timezone('US/Eastern'),
-        # Add more mappings as needed
     }
 
     # Write the data rows
     for entry in sorted(log_data, key=lambda x: int(x['id'])):
         timestamp_original = entry['timestamp']
         parts = timestamp_original.split()
+        # Select the Timezone abbreviation from the original timestamp after splitting
         timezone_abbreviation = parts[-2]
         timezone = timezone_map.get(timezone_abbreviation)
         if timezone:
             dt = parser.parse(timestamp_original, tzinfos={timezone_abbreviation: timezone})
         else:
             dt = parser.parse(timestamp_original, fuzzy=True)
+        # process rimezone in YYY-MM-DD format
         timestamp_formatted = dt.strftime('%Y-%m-%d')
         row = [entry['id'], timestamp_formatted, timestamp_original, timezone_abbreviation, entry['message']]
         for key in sorted(list(keys - {'id', 'timestamp', 'message'})):
