@@ -1,0 +1,9 @@
+ID,Timestamp (YYYY-MM-DD),Timezone,Message,Field_1,Field_2,Field_3,Field_4,Field_5,Field_6,Field_9
+1,2019-06-19,Wed Jun 19 09:35:40 PDT 2019,PDT,test 4,,,,,test 4,,
+2,2019-06-19,Wed Jun 19 09:35:39 PDT 2019,PDT,test 3,,,,test 3,,,
+3,2019-06-19,Wed Jun 19 09:35:38 PDT 2019,PDT,test 2,,,test 2,,,,test 23
+4,2019-06-19,Wed Jun 19 09:35:37 PDT 2019,PDT,test 4,,test 4,,,,,
+5,2019-06-19,Wed Jun 19 09:35:37 PDT 2019,PDT,test 5,,,test 10,,,,
+6,2019-06-19,Wed Jun 19 09:35:40 PDT 2019,PDT,test 6,test 5,,,,,,
+6,2019-06-19,Wed Jun 19 09:35:40 PDT 2019,PDT,test 6,test 5,,,,,,
+10,2019-06-19,Wed Jun 19 09:35:36 PDT 2019,PDT,test 10,test 10,,,,,test 1,
