@@ -1,9 +1,35 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 OPR/113.0.0.0 (Edition std-1)" version="24.7.17">
   <diagram name="Page-1" id="5ZJ2V-JzlnK7SGHw_spI">
-    <mxGraphModel>
+    <mxGraphModel dx="2033" dy="1115" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="fXWO0srzS_eQWeYka94R-2" value="WINDMILLDC&lt;div&gt;IP: 10.10.200.6&lt;/div&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/windows_server.svg;" vertex="1" parent="1">
+          <mxGeometry x="650" y="70" width="57.4" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="fXWO0srzS_eQWeYka94R-3" target="fXWO0srzS_eQWeYka94R-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-10" value="microsoft-ds (Port 445)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="fXWO0srzS_eQWeYka94R-9">
+          <mxGeometry x="0.2482" y="2" relative="1" as="geometry">
+            <mxPoint x="-24" y="2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-3" value="KARIM.windmill.local&lt;div&gt;IP: 10.10.200.11&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.computer;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="238" width="50" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-4" value="WINDMILL\it" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="225.5" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-6" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.378;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="fXWO0srzS_eQWeYka94R-4" target="fXWO0srzS_eQWeYka94R-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="130" y="240" as="sourcePoint" />
+            <mxPoint x="180" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fXWO0srzS_eQWeYka94R-11" value="BRURYA-PC.windmill.local&lt;br&gt;&lt;div&gt;IP: 10.10.200.16&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.computer;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="380" width="50" height="45" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
